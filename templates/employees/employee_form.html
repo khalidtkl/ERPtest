@@ -1,0 +1,295 @@
+{% load form_filters %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ form.instance.pk|yesno:"Edit Employee,Create Employee" }}</title>
+    <!-- Bootstrap CSS for styling -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f7f7f7;
+        }
+        .form-section {
+            margin-bottom: 30px;
+        }
+        .card {
+            padding: 20px;
+            margin-bottom: 30px;
+            border: 1px solid #ddd;
+        }
+        .card-header {
+            font-size: 1.25rem;
+            font-weight: 600;
+            background-color: #f8f9fa;
+        }
+        .btn-submit {
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+    <div class="container mt-5">
+        <div class="row">
+            <div class="col-md-8 offset-md-2">
+                <!-- Employee Form -->
+                <h1 class="text-center">{{ form.instance.pk|yesno:"Edit Employee,Create Employee" }}</h1>
+
+                <!-- Bootstrap Form Structure -->
+                <form method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    
+                    <!-- Employee Details Section -->
+                    <div class="card form-section">
+                        <div class="card-header">
+                            Employee Information
+                        </div>
+                        <div class="card-body">
+                            <div class="mb-3">
+                                <label for="id_code" class="form-label">Employee Code</label>
+                                {{ employee_form.code|add_class:"form-control" }}
+                            </div>
+                            <div class="mb-3">
+                                <label for="id_name" class="form-label">Name</label>
+                                {{ employee_form.name|add_class:"form-control" }}
+                            </div>
+                            <div class="mb-3">
+                                <label for="id_birthday" class="form-label">Birthday</label>
+                                {{ employee_form.birthday|add_class:"form-control" }}
+                                <small class="form-text text-muted">Format: YYYY-MM-DD</small>
+                            </div>
+                            <div class="mb-3">
+                                <label for="id_remarks" class="form-label">Remarks</label>
+                                {{ employee_form.remarks|add_class:"form-control" }}
+                            </div>
+                        </div>
+                    </div>
+                    <ul class="nav nav-tabs" id="employeeTabs" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <a class="nav-link active" id="addresses-tab" data-bs-toggle="tab" href="#addresses" role="tab" aria-controls="addresses" aria-selected="true">Addresses</a>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <a class="nav-link" id="contacts-tab" data-bs-toggle="tab" href="#contacts" role="tab" aria-controls="contacts" aria-selected="false">Contacts</a>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <a class="nav-link" id="documents-tab" data-bs-toggle="tab" href="#documents" role="tab" aria-controls="documents" aria-selected="false">Documents</a>
+                        </li>
+                    </ul>
+                    <div class="tab-content" id="employeeTabsContent">
+                        <!-- Address Formset Section -->
+                        <div class="tab-pane fade show active" id="addresses" role="tabpanel" aria-labelledby="addresses-tab">
+                            <div class="card form-section">
+                                <div class="card-header">
+                                    Addresses
+                                </div>
+                                <div class="card-body">
+                                    <div id="address-formset">
+                                        {{ address_formset.management_form }}
+                                        {% for form in address_formset %}
+                                            <div class="row mb-3">
+                                                <div class="col-md-6">
+                                                    <label class="form-label">Address Type</label>
+                                                    {{ form.address_type|add_class:"form-control" }}
+                                                    <br/>
+                                                    <label class="form-label">Country</label>
+                                                    {{ form.country|add_class:"form-control" }}
+                                                    <br/>
+                                                    <label class="form-label">City</label>
+                                                    {{ form.city|add_class:"form-control" }}
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <label class="form-label">Remarks</label>
+                                                    {{ form.remarks|add_class:"form-control" }}
+                                                </div>
+                                                <div class="col-md-12 text-end mt-2">
+                                                    <button type="button" class="btn btn-danger remove-address-btn">Remove Address</button>
+                                                </div>
+                                            </div>
+                                        {% endfor %}
+                                    </div>
+                                    <button type="button" id="add-address-btn" class="btn btn-primary">Add New Address</button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="tab-pane fade" id="contacts" role="tabpanel" aria-labelledby="contacts-tab">
+                            <!-- Contact Formset Section -->
+                            <div class="card form-section">
+                                <div class="card-header">
+                                    Contacts
+                                </div>
+                                <div class="card-body">
+                                    <div id="contact-formset">
+                                        {{ contact_formset.management_form }}
+                                        {% for form in contact_formset %}
+                                            <div class="row mb-3">
+                                                <div class="col-md-6">
+                                                    <label class="form-label">Contact Type</label>
+                                                    {{ form.contact_type|add_class:"form-control" }}
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <label class="form-label">Value</label>
+                                                    {{ form.value|add_class:"form-control" }}
+                                                </div>
+                                                <div class="col-md-12 text-end mt-2">
+                                                    <button type="button" class="btn btn-danger remove-contact-btn">Remove Contact</button>
+                                                </div>
+                                            </div>
+                                        {% endfor %}
+                                    </div>
+                                    <button type="button" id="add-contact-btn" class="btn btn-primary">Add New Contact</button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="tab-pane fade" id="documents" role="tabpanel" aria-labelledby="documents-tab">
+                            <!-- Document Formset Section -->
+                            <div class="card form-section">
+                                <div class="card-header">
+                                    Documents
+                                </div>
+                                <div class="card-body">
+                                    <div id="document-formset">
+                                        {{ document_formset.management_form }}
+                                        {% for form in document_formset %}
+                                            <div class="row mb-3">
+                                                <div class="col-md-4">
+                                                    <label class="form-label">File</label>
+                                                    {{ form.file|add_class:"form-control" }}
+                                                </div>
+                                                <div class="col-md-4">
+                                                    <label class="form-label">File Description</label>
+                                                    {{ form.file_description|add_class:"form-control" }}
+                                                </div>
+                                                <div class="col-md-4">
+                                                    <label class="form-label">Remarks</label>
+                                                    {{ form.remarks|add_class:"form-control" }}
+                                                </div>
+                                                <div class="col-md-12 text-end mt-2">
+                                                    <button type="button" class="btn btn-danger remove-document-btn">Remove Document</button>
+                                                </div>
+                                            </div>
+                                        {% endfor %}
+                                    </div>
+                                    <button type="button" id="add-document-btn" class="btn btn-primary">Add New Document</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Submit and Cancel Buttons -->
+                    <div class="form-group text-center">
+                        <button type="submit" class="btn btn-success btn-submit">Save Employee</button>
+                        <a href="{% url 'employee_list' %}" class="btn btn-secondary btn-submit">Cancel</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS and dependencies -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- JS for dynamically adding/removing formset rows -->
+    <script>
+        // Add new row for Address formset
+        document.getElementById('add-address-btn').addEventListener('click', function() {
+            var formIdx = document.querySelectorAll('.row.address-form').length;
+            var newForm = document.getElementById('empty-address-form').innerHTML.replace(/__prefix__/g, formIdx);
+            document.getElementById('address-formset').insertAdjacentHTML('beforeend', newForm);
+        });
+
+        // Add new row for Contact formset
+        document.getElementById('add-contact-btn').addEventListener('click', function() {
+            var formIdx = document.querySelectorAll('.row.contact-form').length;
+            var newForm = document.getElementById('empty-contact-form').innerHTML.replace(/__prefix__/g, formIdx);
+            document.getElementById('contact-formset').insertAdjacentHTML('beforeend', newForm);
+        });
+
+        // Add new row for Document formset
+        document.getElementById('add-document-btn').addEventListener('click', function() {
+            var formIdx = document.querySelectorAll('.row.document-form').length;
+            var newForm = document.getElementById('empty-document-form').innerHTML.replace(/__prefix__/g, formIdx);
+            document.getElementById('document-formset').insertAdjacentHTML('beforeend', newForm);
+        });
+
+        // Remove row for Address formset
+        document.addEventListener('click', function(e) {
+            if (e.target && e.target.classList.contains('remove-address-btn')) {
+                e.target.closest('.row').remove();
+            }
+        });
+
+        // Remove row for Contact formset
+        document.addEventListener('click', function(e) {
+            if (e.target && e.target.classList.contains('remove-contact-btn')) {
+                e.target.closest('.row').remove();
+            }
+        });
+
+        // Remove row for Document formset
+        document.addEventListener('click', function(e) {
+            if (e.target && e.target.classList.contains('remove-document-btn')) {
+                e.target.closest('.row').remove();
+            }
+        });
+    </script>
+    <div id="empty-address-form" style="display: none;">
+        <div class="row address-form">
+            <div class="col-md-6">
+                <label class="form-label">Address Type</label>
+                {{ address_formset.empty_form.address_type|add_class:"form-control" }}
+                <br/>
+                <label class="form-label">Country</label>
+                {{ address_formset.empty_form.country|add_class:"form-control" }}
+                <br/>
+                <label class="form-label">City</label>
+                {{ address_formset.empty_form.city|add_class:"form-control" }}
+            </div>
+            <div class="col-md-6">
+                <label class="form-label">Remarks</label>
+                {{ address_formset.empty_form.remarks|add_class:"form-control" }}
+            </div>
+            <div class="col-md-12 text-end mt-2">
+                <button type="button" class="btn btn-danger remove-address-btn">Remove Address</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="empty-contact-form" style="display: none;">
+        <div class="row contact-form">
+            <div class="col-md-6">
+                <label class="form-label">Contact Type</label>
+                {{ contact_formset.empty_form.contact_type|add_class:"form-control" }}
+            </div>
+            <div class="col-md-6">
+                <label class="form-label">Value</label>
+                {{ contact_formset.empty_form.value|add_class:"form-control" }}
+            </div>
+            <div class="col-md-12 text-end mt-2">
+                <button type="button" class="btn btn-danger remove-address-btn">Remove Contact</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="empty-document-form" style="display: none;">
+        <div class="row document-form">
+            <div class="col-md-4">
+                <label class="form-label">File</label>
+                {{ document_formset.empty_form.file|add_class:"form-control" }}
+            </div>
+            <div class="col-md-4">
+                <label class="form-label">File Description</label>
+                {{ document_formset.empty_form.file_description|add_class:"form-control" }}
+            </div>
+            <div class="col-md-4">
+                <label class="form-label">Remarks</label>
+                {{ document_formset.empty_form.remarks|add_class:"form-control" }}
+            </div>
+            <div class="col-md-12 text-end mt-2">
+                <button type="button" class="btn btn-danger remove-address-btn">Remove Document</button>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>
